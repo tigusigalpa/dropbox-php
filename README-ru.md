@@ -1,5 +1,7 @@
 # Dropbox PHP SDK
 
+![Dropbox PHP SDK](https://github.com/user-attachments/assets/361952c5-03d0-4ef6-b0b8-3106bb4ca3be)
+
 [![Latest Version](https://img.shields.io/packagist/v/tigusigalpa/dropbox-php.svg)](https://packagist.org/packages/tigusigalpa/dropbox-php)
 [![License](https://img.shields.io/packagist/l/tigusigalpa/dropbox-php.svg)](https://github.com/tigusigalpa/dropbox-php/blob/main/LICENSE)
 [![PHP Version](https://img.shields.io/packagist/php-v/tigusigalpa/dropbox-php.svg)](https://packagist.org/packages/tigusigalpa/dropbox-php)
