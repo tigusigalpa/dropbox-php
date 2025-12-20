@@ -1,0 +1,58 @@
+{
+    "name": "tigusigalpa/dropbox-php",
+    "description": "Modern PHP SDK for Dropbox API v2 integration with Laravel support",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Igor Sazonov",
+            "email": "sovletig@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "guzzlehttp/guzzle": "^7.0",
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "orchestra/testbench": "^8.0|^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tigusigalpa\\Dropbox\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tigusigalpa\\Dropbox\\Tests\\": "tests/"
+        }
+    },
+    "keywords": [
+        "dropbox",
+        "api",
+        "sdk",
+        "laravel",
+        "file-upload",
+        "file-download",
+        "cloud-storage",
+        "file-sharing"
+    ],
+    "homepage": "https://github.com/tigusigalpa/dropbox-php",
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html=coverage"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Tigusigalpa\\Dropbox\\DropboxServiceProvider"
+            ],
+            "aliases": {
+                "Dropbox": "Tigusigalpa\\Dropbox\\Facades\\Dropbox"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
