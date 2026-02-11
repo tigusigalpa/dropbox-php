@@ -6,15 +6,15 @@
 [![License](https://img.shields.io/packagist/l/tigusigalpa/dropbox-php.svg)](https://github.com/tigusigalpa/dropbox-php/blob/main/LICENSE)
 [![PHP Version](https://img.shields.io/packagist/php-v/tigusigalpa/dropbox-php.svg)](https://packagist.org/packages/tigusigalpa/dropbox-php)
 
-Modern, production-ready PHP SDK for [Dropbox API v2](https://www.dropbox.com/developers/documentation/http/documentation) with full
-Laravel support (versions 8-12). This comprehensive package provides a clean, intuitive, and type-safe interface for interacting with Dropbox's
-powerful cloud storage, file sharing, and collaboration features. Whether you're building a file management system, backup solution, document collaboration platform, or integrating cloud storage into your PHP application, this SDK offers everything you need to work seamlessly with Dropbox.
+PHP SDK for [Dropbox API v2](https://www.dropbox.com/developers/documentation/http/documentation) with Laravel 8-12 support.
+Provides a type-safe interface for working with Dropbox storage, file sharing, and collaboration from PHP 8.1+ applications.
+Can be used standalone or as a Laravel package with auto-registered service provider and facade.
 
-## Why Choose This Dropbox PHP SDK?
+## What's Inside
 
-This library stands out as the most complete and modern Dropbox integration solution for PHP developers. Built with PHP 8.1+ and following industry best practices, it provides enterprise-grade reliability while maintaining simplicity for rapid development. Unlike other Dropbox libraries, this SDK offers complete API v2 coverage, native Laravel integration, comprehensive error handling, and extensive documentation with real-world examples.
+The package covers all major Dropbox API v2 endpoints: files, sharing, users, file requests, and Paper. It handles OAuth 2.0 flows, chunked uploads for large files, and batch operations. Error handling is built around a dedicated exception class with access to Dropbox error details.
 
-**Perfect for:** Web applications, SaaS platforms, content management systems, backup solutions, file sharing services, document management systems, media galleries, collaborative tools, and any PHP project requiring cloud storage integration.
+Laravel users get a service provider, facade, and config publishing out of the box. Everyone else can use `DropboxClient` directly — no framework required.
 
 **🌐 Language:** English | [Русский](README-ru.md)
 
@@ -22,6 +22,7 @@ This library stands out as the most complete and modern Dropbox integration solu
 
 - [Features](#features)
 - [Supported Endpoints](#supported-endpoints)
+- [What's Inside](#whats-inside)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
@@ -44,16 +45,16 @@ This library stands out as the most complete and modern Dropbox integration solu
 
 ## Features
 
-- ✅ **Full Dropbox API v2 Coverage** - Complete implementation of all major endpoints
-- 🚀 **Laravel Integration** - Seamless integration with Laravel 8, 9, 10, 11, and 12
-- 🎯 **Modern PHP** - Built with PHP 8.1+ features and best practices
-- 📦 **Standalone Usage** - Works perfectly outside Laravel projects
-- 🔐 **OAuth 2.0 Support** - Built-in OAuth flow helpers
-- 📝 **Comprehensive Documentation** - Detailed examples and API references
-- 🧪 **Well Tested** - Includes PHPUnit test suite
-- 🎨 **Clean API** - Intuitive, chainable methods
-- ⚡ **Chunked Upload** - Support for uploading large files in chunks
-- 🔄 **Batch Operations** - Efficient batch operations
+- ✅ **Dropbox API v2** — all major endpoints covered
+- 🚀 **Laravel 8–12** — service provider, facade, config publishing
+- 🎯 **PHP 8.1+** — typed properties, enums, named arguments
+- 📦 **Standalone** — works without any framework
+- 🔐 **OAuth 2.0** — authorization URL, token exchange, refresh
+- 📝 **Documentation** — usage examples and API reference
+- 🧪 **Tests** — PHPUnit test suite included
+- 🎨 **Clean API** — `$client->files->upload(...)` style
+- ⚡ **Chunked Upload** — large files uploaded in configurable chunks
+- 🔄 **Batch Operations** — copy, move, delete up to 1000 files per call
 
 ## Supported Endpoints
 
@@ -890,15 +891,10 @@ if ($changes['changes']) {
 
 ### Efficient File Operations
 
-This SDK is optimized for performance with several key features:
-
-**Chunked Uploads:** Large files are automatically handled through chunked upload sessions, preventing memory exhaustion and timeout issues. The SDK efficiently manages upload sessions with configurable chunk sizes (default 4MB) for optimal performance across different network conditions.
-
-**Batch Operations:** Process multiple files simultaneously using batch endpoints, reducing API calls and improving throughput. Batch operations support up to 1000 files per request for copy, move, and delete operations.
-
-**Connection Pooling:** Built on Guzzle HTTP client with persistent connections, reducing overhead for multiple API calls within the same session.
-
-**Memory Management:** Stream-based file handling for downloads prevents loading entire files into memory, making it suitable for processing large media files and archives.
+- **Chunked uploads** — large files are split into chunks (default 4MB, configurable) to avoid memory and timeout issues
+- **Batch endpoints** — copy, move, delete up to 1000 files in a single API call
+- **Persistent connections** — Guzzle keeps connections alive between requests
+- **Stream-based downloads** — files are not loaded entirely into memory
 
 ### Caching Strategies
 
@@ -915,9 +911,9 @@ $linkCache = Cache::remember('dropbox_link_' . $fileId, 86400, function() use ($
 });
 ```
 
-### Rate Limiting Best Practices
+### Rate Limiting
 
-Dropbox API implements rate limiting. This SDK handles rate limit responses gracefully:
+Dropbox API has rate limits. When you hit them, the SDK throws an exception with code 429:
 
 ```php
 try {
@@ -1083,11 +1079,11 @@ public function upload(DropboxClient $dropbox) {
 
 ## Testing
 
-The package includes:
+The package ships with:
 
 - Unit tests for core functionality
 - Integration test examples
-- GitHub Actions workflow for CI/CD
+- GitHub Actions CI/CD workflow
 - PHPUnit configuration
 
 Run tests:
@@ -1123,7 +1119,7 @@ composer test:coverage
 
 ## Contributing
 
-We welcome your contributions! Please follow these guidelines:
+Contributions are welcome. Please follow these guidelines:
 
 ### Coding Standards
 
@@ -1296,59 +1292,59 @@ try {
 
 **Q: Is this library production-ready?**
 
-A: Yes, this SDK is production-ready and actively maintained. It includes comprehensive error handling, extensive test coverage, and follows PHP best practices. Many applications use it in production environments.
+A: Yes. It has error handling, test coverage, and follows PSR-12. Used in production by several projects.
 
 **Q: What's the difference between this and the official Dropbox SDK?**
 
-A: This SDK provides a more modern, Laravel-friendly interface with better documentation and examples. It's built specifically for PHP 8.1+ with type safety, comprehensive error handling, and seamless Laravel integration out of the box.
+A: This package targets PHP 8.1+, ships with Laravel integration (service provider, facade, config), and provides a simpler method-based API. The official SDK is more low-level.
 
 **Q: Can I use this without Laravel?**
 
-A: Absolutely! The SDK works perfectly as a standalone PHP library. Laravel integration is optional and provided as an additional convenience feature.
+A: Yes, works as a standalone PHP library. Laravel integration is optional.
 
 **Q: Does it support Dropbox Business/Team accounts?**
 
-A: Yes, the SDK supports both personal and business Dropbox accounts. For team operations, use the appropriate team-scoped access tokens.
+A: Yes, both personal and business accounts are supported. Use team-scoped access tokens for team operations.
 
 ### Technical Questions
 
 **Q: What's the maximum file size I can upload?**
 
-A: Using chunked upload, you can upload files up to 350GB. For files under 150MB, use the simple upload method. For larger files, use the upload session methods.
+A: Up to 350GB with chunked upload. Files under 150MB can use the simple `upload()` method. Larger files go through upload sessions.
 
 **Q: How do I handle rate limiting?**
 
-A: The SDK throws a DropboxException with code 429 when rate limited. Implement exponential backoff retry logic as shown in the troubleshooting section.
+A: The SDK throws `DropboxException` with code 429. Implement exponential backoff as shown in the troubleshooting section.
 
 **Q: Can I upload files from URLs directly to Dropbox?**
 
-A: Yes, use the `saveUrl()` method which tells Dropbox to download the file from a URL directly, saving bandwidth and time.
+A: Yes, `saveUrl()` tells Dropbox to fetch the file from a URL on its side.
 
 **Q: How do I get a permanent link to a file?**
 
-A: Use `createSharedLinkWithSettings()` to create a permanent shared link. Temporary links (4-hour expiry) can be created with `getTemporaryLink()`.
+A: `createSharedLinkWithSettings()` gives you a permanent link. For short-lived links (4 hours), use `getTemporaryLink()`.
 
 **Q: Does it support Dropbox Paper?**
 
-A: Yes, full Paper API support is included for creating, editing, sharing, and managing Dropbox Paper documents.
+A: Yes, the Paper endpoint covers creating, editing, sharing, and deleting Paper documents.
 
 **Q: How do I handle file conflicts?**
 
-A: Use the `mode` parameter in upload methods: `'add'` (fail if exists), `'overwrite'` (replace existing), or `'update'` (update specific revision).
+A: Pass the `mode` parameter: `'add'` (fail if exists), `'overwrite'` (replace), or `'update'` (update a specific revision).
 
 ### Security Questions
 
 **Q: How should I store access tokens?**
 
-A: Never store tokens in plain text. Use Laravel's encryption (`encrypt()`), environment variables, or secure key management systems. For production, implement OAuth flow with refresh tokens.
+A: Don't store tokens in plain text. Use `encrypt()` in Laravel, environment variables, or a secrets manager. In production, use OAuth with refresh tokens.
 
 **Q: Is it safe to use in multi-tenant applications?**
 
-A: Yes, create separate DropboxClient instances per user with their individual access tokens. Never share tokens between users.
+A: Yes. Create a separate `DropboxClient` per user with their own token. Don't share tokens between users.
 
 **Q: How do I revoke access?**
 
-A: Revoke tokens through the Dropbox App Console or implement token revocation in your application's settings.
+A: Revoke tokens via the Dropbox App Console or build a revocation flow in your app settings.
 
 ## Best Practices
 
@@ -1405,28 +1401,23 @@ Route::post('/dropbox/webhook', [DropboxWebhookController::class, 'handle'])
     ->middleware('verify.dropbox.signature');
 ```
 
-## Comparison with Alternatives
+## Comparison with Official Dropbox SDK
 
-### Why Choose This SDK Over Others?
-
-| Feature | This SDK | Official Dropbox SDK | Other Libraries |
-|---------|----------|---------------------|------------------|
-| PHP Version | 8.1+ (Modern) | 7.4+ | Varies |
-| Laravel Integration | Native, Built-in | Manual | Limited/None |
-| API v2 Coverage | Complete | Complete | Partial |
-| Documentation | Extensive + Examples | API Reference Only | Limited |
-| Type Safety | Full Type Hints | Partial | Minimal |
-| Error Handling | Comprehensive | Basic | Varies |
-| Chunked Upload | Built-in | Manual Implementation | Often Missing |
-| Batch Operations | Full Support | Full Support | Limited |
-| OAuth 2.0 Helpers | Included | Manual | Manual |
-| Active Maintenance | Yes | Yes | Often Abandoned |
-| Test Coverage | Comprehensive | Good | Varies |
-| Code Quality | PSR-12, Modern PHP | Good | Varies |
+| Feature | This SDK | Official Dropbox SDK |
+|---------|----------|---------------------|
+| PHP Version | 8.1+ | 7.4+ |
+| Laravel Integration | Built-in (provider, facade) | Manual |
+| API v2 Coverage | All major endpoints | All endpoints |
+| Documentation | Examples + API reference | API reference |
+| Type Safety | Full type hints | Partial |
+| Error Handling | Dedicated exception class | Basic exceptions |
+| Chunked Upload | Built-in helpers | Manual implementation |
+| Batch Operations | Supported | Supported |
+| OAuth 2.0 Helpers | Included | Manual |
 
 ### Migration from Other Libraries
 
-Migrating from other Dropbox libraries is straightforward:
+Method names map closely to the Dropbox HTTP API documentation:
 
 ```php
 // Old library (example)
@@ -1442,7 +1433,7 @@ $dropbox->getMetadata('/path');
 $client->files->getMetadata('/path');
 ```
 
-The SDK follows intuitive naming conventions that map directly to Dropbox API documentation, making migration and learning easier.
+Method names follow the Dropbox API naming, so the [official HTTP docs](https://www.dropbox.com/developers/documentation/http/documentation) serve as a reference.
 
 ## Real-World Use Cases
 
