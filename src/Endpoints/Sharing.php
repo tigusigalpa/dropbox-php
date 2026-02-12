@@ -747,4 +747,124 @@ class Sharing
             $policies
         ));
     }
+
+    /**
+     * Convert a Dropbox shared link to a direct link for image hosting.
+     * 
+     * This method converts a standard Dropbox shared link into a direct link
+     * that can be used to embed images in HTML, Markdown, or other content.
+     * 
+     * Supports two conversion methods:
+     * 1. 'raw' - Changes ?dl=0 to ?raw=1
+     * 2. 'userusercontent' - Replaces www.dropbox.com with dl.dropboxusercontent.com
+     *
+     * @param string $url Dropbox shared link (e.g., https://www.dropbox.com/s/abcd1234/image.jpg?dl=0)
+     * @param string $method Conversion method: 'raw' or 'userusercontent' (default: 'userusercontent')
+     * @return string Direct link for image hosting
+     * @throws \InvalidArgumentException If URL is invalid or method is not supported
+     * 
+     * @example
+     * // Using userusercontent method (recommended)
+     * $directLink = $client->sharing->convertToDirectLink(
+     *     'https://www.dropbox.com/s/abcd1234/image.jpg?dl=0'
+     * );
+     * // Returns: https://dl.dropboxusercontent.com/s/abcd1234/image.jpg
+     * 
+     * // Using raw method
+     * $directLink = $client->sharing->convertToDirectLink(
+     *     'https://www.dropbox.com/s/abcd1234/image.jpg?dl=0',
+     *     'raw'
+     * );
+     * // Returns: https://www.dropbox.com/s/abcd1234/image.jpg?raw=1
+     */
+    public function convertToDirectLink(string $url, string $method = 'userusercontent'): string
+    {
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new \InvalidArgumentException('Invalid URL provided');
+        }
+
+        if (!str_contains($url, 'dropbox.com')) {
+            throw new \InvalidArgumentException('URL must be a Dropbox link');
+        }
+
+        return match ($method) {
+            'raw' => $this->convertToRawLink($url),
+            'userusercontent' => $this->convertToUsercontentLink($url),
+            default => throw new \InvalidArgumentException(
+                "Invalid conversion method. Use 'raw' or 'userusercontent'"
+            ),
+        };
+    }
+
+    /**
+     * Convert Dropbox link by replacing ?dl=0 with ?raw=1.
+     * 
+     * This method changes the download parameter to raw, which forces
+     * the browser to display the file directly instead of showing
+     * the Dropbox preview page.
+     *
+     * @param string $url Dropbox shared link
+     * @return string Direct link with ?raw=1 parameter
+     */
+    public function convertToRawLink(string $url): string
+    {
+        $url = str_replace('?dl=0', '?raw=1', $url);
+        $url = str_replace('&dl=0', '&raw=1', $url);
+        
+        if (!str_contains($url, '?raw=1') && !str_contains($url, '&raw=1')) {
+            $separator = str_contains($url, '?') ? '&' : '?';
+            $url .= $separator . 'raw=1';
+        }
+        
+        return $url;
+    }
+
+    /**
+     * Convert Dropbox link by replacing www.dropbox.com with dl.dropboxusercontent.com.
+     * 
+     * This method uses Dropbox's content delivery domain which serves
+     * files directly without any preview interface. This is the recommended
+     * method for image hosting as it provides cleaner URLs.
+     *
+     * @param string $url Dropbox shared link
+     * @return string Direct link using dl.dropboxusercontent.com domain
+     */
+    public function convertToUsercontentLink(string $url): string
+    {
+        $url = str_replace('www.dropbox.com', 'dl.dropboxusercontent.com', $url);
+        $url = str_replace('dropbox.com', 'dl.dropboxusercontent.com', $url);
+        
+        $url = preg_replace('/\?dl=\d+/', '', $url);
+        $url = preg_replace('/&dl=\d+/', '', $url);
+        
+        return rtrim($url, '?&');
+    }
+
+    /**
+     * Create a shared link and immediately convert it to a direct link.
+     * 
+     * This is a convenience method that combines creating a shared link
+     * and converting it to a direct link in one call.
+     *
+     * @param string $path Path to the file in Dropbox
+     * @param array $settings Optional link settings
+     * @param string $method Conversion method: 'raw' or 'userusercontent'
+     * @return array Array with 'url' (original), 'direct_url' (converted), and full metadata
+     * @throws DropboxException
+     * 
+     * @example
+     * $result = $client->sharing->createDirectLink('/Photos/vacation.jpg');
+     * echo '<img src="' . $result['direct_url'] . '" alt="Vacation">';
+     */
+    public function createDirectLink(
+        string $path,
+        array $settings = [],
+        string $method = 'userusercontent'
+    ): array {
+        $linkData = $this->createSharedLinkWithSettings($path, $settings);
+        
+        $linkData['direct_url'] = $this->convertToDirectLink($linkData['url'], $method);
+        
+        return $linkData;
+    }
 }

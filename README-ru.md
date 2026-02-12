@@ -29,6 +29,7 @@ PHP SDK для [Dropbox API v2](https://www.dropbox.com/developers/documentation
 - [Подробные примеры использования](#подробные-примеры-использования)
     - [Работа с файлами](#работа-с-файлами)
     - [Совместный доступ](#совместный-доступ)
+    - [Хостинг изображений с прямыми ссылками](#хостинг-изображений-с-прямыми-ссылками)
     - [Пользователи и аккаунт](#пользователи-и-аккаунт)
     - [File Requests](#file-requests)
     - [Paper документы](#paper-документы)
@@ -537,6 +538,96 @@ $client->sharing->removeFileMember(
     ['.tag' => 'email', 'email' => 'client@example.com']
 );
 ```
+
+#### Хостинг изображений с прямыми ссылками
+
+Преобразование обычных Dropbox ссылок в прямые ссылки для встраивания изображений в HTML, Markdown или другой контент. Идеально подходит для хостинга изображений для блогов, портфолио или документации.
+
+```php
+// Преобразовать существующую общую ссылку в прямую ссылку
+$sharedLink = 'https://www.dropbox.com/s/abcd1234/image.jpg?dl=0';
+
+// Метод 1: Использование userusercontent (рекомендуется - более чистые URL)
+$directLink = $client->sharing->convertToDirectLink($sharedLink);
+// Вернет: https://dl.dropboxusercontent.com/s/abcd1234/image.jpg
+
+// Метод 2: Использование параметра raw
+$directLink = $client->sharing->convertToDirectLink($sharedLink, 'raw');
+// Вернет: https://www.dropbox.com/s/abcd1234/image.jpg?raw=1
+
+// Создать новую общую ссылку и сразу преобразовать её
+$result = $client->sharing->createDirectLink('/Photos/vacation.jpg');
+echo "Прямая ссылка: " . $result['direct_url'];
+
+// Использование в HTML
+echo '<img src="' . $result['direct_url'] . '" alt="Отпуск">';
+
+// Использование в Markdown
+echo '![Отпуск](' . $result['direct_url'] . ')';
+
+// Создать защищенную паролем прямую ссылку с истечением срока
+$result = $client->sharing->createDirectLink(
+    '/Photos/private.jpg',
+    [
+        'link_password' => 'mypassword123',
+        'expires' => '2024-12-31T23:59:59Z',
+    ]
+);
+
+// Пакетное преобразование нескольких ссылок
+$links = [
+    'https://www.dropbox.com/s/abc123/img1.jpg?dl=0',
+    'https://www.dropbox.com/s/def456/img2.png?dl=0',
+];
+
+foreach ($links as $link) {
+    $directLink = $client->sharing->convertToDirectLink($link);
+    echo $directLink . "\n";
+}
+
+// Создать галерею изображений
+$photos = $client->files->listFolder('/Photos');
+$gallery = [];
+
+foreach ($photos['entries'] as $photo) {
+    if ($photo['.tag'] === 'file' && preg_match('/\.(jpg|jpeg|png|gif)$/i', $photo['name'])) {
+        $linkData = $client->sharing->createDirectLink($photo['path_display']);
+        $gallery[] = [
+            'name' => $photo['name'],
+            'url' => $linkData['direct_url'],
+        ];
+    }
+}
+
+// Отобразить галерею
+foreach ($gallery as $image) {
+    echo '<img src="' . $image['url'] . '" alt="' . $image['name'] . '">' . "\n";
+}
+```
+
+**Пример для Laravel:**
+
+```php
+use Tigusigalpa\Dropbox\Facades\Dropbox;
+
+// Преобразовать ссылку
+$directLink = Dropbox::sharing()->convertToDirectLink($sharedLink);
+
+// Загрузить и получить прямую ссылку
+$file = $request->file('image');
+$content = file_get_contents($file->getRealPath());
+Dropbox::files()->upload('/Images/' . $file->getClientOriginalName(), $content);
+
+$result = Dropbox::sharing()->createDirectLink('/Images/' . $file->getClientOriginalName());
+return response()->json(['url' => $result['direct_url']]);
+```
+
+**Преимущества:**
+- ✅ Не нужны внешние сервисы для хостинга изображений
+- ✅ Прямое встраивание в HTML, Markdown, форумы и т.д.
+- ✅ Надежная доставка через CDN инфраструктуру Dropbox
+- ✅ Поддержка защиты паролем и сроков истечения
+- ✅ Два метода преобразования для разных случаев использования
 
 ### Пользователи и аккаунт
 

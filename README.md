@@ -29,6 +29,7 @@ Laravel users get a service provider, facade, and config publishing out of the b
 - [Detailed Usage Examples](#detailed-usage-examples)
     - [Working with Files](#working-with-files)
     - [Sharing](#sharing)
+    - [Image Hosting with Direct Links](#image-hosting-with-direct-links)
     - [Users and Account](#users-and-account)
     - [File Requests](#file-requests)
     - [Paper Documents](#paper-documents)
@@ -538,6 +539,96 @@ $client->sharing->removeFileMember(
     ['.tag' => 'email', 'email' => 'client@example.com']
 );
 ```
+
+#### Image Hosting with Direct Links
+
+Convert Dropbox shared links to direct links for embedding images in HTML, Markdown, or other content. This is perfect for hosting images for blogs, portfolios, or documentation.
+
+```php
+// Convert existing shared link to direct link
+$sharedLink = 'https://www.dropbox.com/s/abcd1234/image.jpg?dl=0';
+
+// Method 1: Using userusercontent (recommended - cleaner URLs)
+$directLink = $client->sharing->convertToDirectLink($sharedLink);
+// Returns: https://dl.dropboxusercontent.com/s/abcd1234/image.jpg
+
+// Method 2: Using raw parameter
+$directLink = $client->sharing->convertToDirectLink($sharedLink, 'raw');
+// Returns: https://www.dropbox.com/s/abcd1234/image.jpg?raw=1
+
+// Create a new shared link and convert it immediately
+$result = $client->sharing->createDirectLink('/Photos/vacation.jpg');
+echo "Direct URL: " . $result['direct_url'];
+
+// Use in HTML
+echo '<img src="' . $result['direct_url'] . '" alt="Vacation">';
+
+// Use in Markdown
+echo '![Vacation](' . $result['direct_url'] . ')';
+
+// Create password-protected direct link with expiration
+$result = $client->sharing->createDirectLink(
+    '/Photos/private.jpg',
+    [
+        'link_password' => 'mypassword123',
+        'expires' => '2024-12-31T23:59:59Z',
+    ]
+);
+
+// Batch convert multiple links
+$links = [
+    'https://www.dropbox.com/s/abc123/img1.jpg?dl=0',
+    'https://www.dropbox.com/s/def456/img2.png?dl=0',
+];
+
+foreach ($links as $link) {
+    $directLink = $client->sharing->convertToDirectLink($link);
+    echo $directLink . "\n";
+}
+
+// Create image gallery
+$photos = $client->files->listFolder('/Photos');
+$gallery = [];
+
+foreach ($photos['entries'] as $photo) {
+    if ($photo['.tag'] === 'file' && preg_match('/\.(jpg|jpeg|png|gif)$/i', $photo['name'])) {
+        $linkData = $client->sharing->createDirectLink($photo['path_display']);
+        $gallery[] = [
+            'name' => $photo['name'],
+            'url' => $linkData['direct_url'],
+        ];
+    }
+}
+
+// Display gallery
+foreach ($gallery as $image) {
+    echo '<img src="' . $image['url'] . '" alt="' . $image['name'] . '">' . "\n";
+}
+```
+
+**Laravel Example:**
+
+```php
+use Tigusigalpa\Dropbox\Facades\Dropbox;
+
+// Convert link
+$directLink = Dropbox::sharing()->convertToDirectLink($sharedLink);
+
+// Upload and get direct link
+$file = $request->file('image');
+$content = file_get_contents($file->getRealPath());
+Dropbox::files()->upload('/Images/' . $file->getClientOriginalName(), $content);
+
+$result = Dropbox::sharing()->createDirectLink('/Images/' . $file->getClientOriginalName());
+return response()->json(['url' => $result['direct_url']]);
+```
+
+**Benefits:**
+- ✅ No need for external image hosting services
+- ✅ Direct embedding in HTML, Markdown, forums, etc.
+- ✅ Reliable CDN delivery via Dropbox infrastructure
+- ✅ Support for password protection and expiration dates
+- ✅ Two conversion methods for different use cases
 
 ### Users and Account
 
