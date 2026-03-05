@@ -6,15 +6,22 @@
 [![License](https://img.shields.io/packagist/l/tigusigalpa/dropbox-php.svg)](https://github.com/tigusigalpa/dropbox-php/blob/main/LICENSE)
 [![PHP Version](https://img.shields.io/packagist/php-v/tigusigalpa/dropbox-php.svg)](https://packagist.org/packages/tigusigalpa/dropbox-php)
 
-PHP SDK for [Dropbox API v2](https://www.dropbox.com/developers/documentation/http/documentation) with Laravel 8-12 support.
-Provides a type-safe interface for working with Dropbox storage, file sharing, and collaboration from PHP 8.1+ applications.
+PHP SDK for [Dropbox API v2](https://www.dropbox.com/developers/documentation/http/documentation) with Laravel 8-12
+support.
+Provides a type-safe interface for working with Dropbox storage, file sharing, and collaboration from PHP 8.1+
+applications.
 Can be used standalone or as a Laravel package with auto-registered service provider and facade.
+
+> 📖 **[Full documentation available on Wiki](https://github.com/tigusigalpa/dropbox-php/wiki)**
 
 ## What's Inside
 
-The package covers all major Dropbox API v2 endpoints: files, sharing, users, file requests, and Paper. It handles OAuth 2.0 flows, chunked uploads for large files, and batch operations. Error handling is built around a dedicated exception class with access to Dropbox error details.
+The package covers all major Dropbox API v2 endpoints: files, sharing, users, file requests, and Paper. It handles OAuth
+2.0 flows, chunked uploads for large files, and batch operations. Error handling is built around a dedicated exception
+class with access to Dropbox error details.
 
-Laravel users get a service provider, facade, and config publishing out of the box. Everyone else can use `DropboxClient` directly — no framework required.
+Laravel users get a service provider, facade, and config publishing out of the box. Everyone else can use
+`DropboxClient` directly — no framework required.
 
 **🌐 Language:** English | [Русский](README-ru.md)
 
@@ -542,7 +549,8 @@ $client->sharing->removeFileMember(
 
 #### Image Hosting with Direct Links
 
-Convert Dropbox shared links to direct links for embedding images in HTML, Markdown, or other content. This is perfect for hosting images for blogs, portfolios, or documentation.
+Convert Dropbox shared links to direct links for embedding images in HTML, Markdown, or other content. This is perfect
+for hosting images for blogs, portfolios, or documentation.
 
 ```php
 // Convert existing shared link to direct link
@@ -624,6 +632,7 @@ return response()->json(['url' => $result['direct_url']]);
 ```
 
 **Benefits:**
+
 - ✅ No need for external image hosting services
 - ✅ Direct embedding in HTML, Markdown, forums, etc.
 - ✅ Reliable CDN delivery via Dropbox infrastructure
@@ -1267,6 +1276,7 @@ When adding new Dropbox API endpoints:
 **Problem:** "Invalid access token" error
 
 **Solutions:**
+
 - Verify your access token is correct and not expired
 - For OAuth tokens, implement refresh token logic
 - Check that your app has the required permissions/scopes
@@ -1290,6 +1300,7 @@ try {
 **Problem:** Upload fails for large files or times out
 
 **Solutions:**
+
 - Use chunked upload for files larger than 150MB
 - Increase PHP `max_execution_time` and `memory_limit`
 - Implement retry logic for network failures
@@ -1306,7 +1317,7 @@ while ($attempt < $maxRetries) {
         break;
     } catch (DropboxException $e) {
         $attempt++;
-        if ($attempt >= $maxRetries) throw $e;
+        if ($attempt >= $maxRetries) {throw $e;}
         sleep(2 ** $attempt); // Exponential backoff
     }
 }
@@ -1317,6 +1328,7 @@ while ($attempt < $maxRetries) {
 **Problem:** "Path not found" or "Malformed path" errors
 
 **Solutions:**
+
 - Ensure paths start with `/` (e.g., `/Documents/file.txt`)
 - Use proper encoding for special characters
 - Check that parent folders exist before creating files
@@ -1342,6 +1354,7 @@ $client->files->upload($filePath, $content);
 **Problem:** Service provider not loading or facade not working
 
 **Solutions:**
+
 - Clear Laravel cache: `php artisan cache:clear`
 - Clear config cache: `php artisan config:clear`
 - Republish config: `php artisan vendor:publish --tag=dropbox-config --force`
@@ -1387,7 +1400,8 @@ A: Yes. It has error handling, test coverage, and follows PSR-12. Used in produc
 
 **Q: What's the difference between this and the official Dropbox SDK?**
 
-A: This package targets PHP 8.1+, ships with Laravel integration (service provider, facade, config), and provides a simpler method-based API. The official SDK is more low-level.
+A: This package targets PHP 8.1+, ships with Laravel integration (service provider, facade, config), and provides a
+simpler method-based API. The official SDK is more low-level.
 
 **Q: Can I use this without Laravel?**
 
@@ -1401,11 +1415,13 @@ A: Yes, both personal and business accounts are supported. Use team-scoped acces
 
 **Q: What's the maximum file size I can upload?**
 
-A: Up to 350GB with chunked upload. Files under 150MB can use the simple `upload()` method. Larger files go through upload sessions.
+A: Up to 350GB with chunked upload. Files under 150MB can use the simple `upload()` method. Larger files go through
+upload sessions.
 
 **Q: How do I handle rate limiting?**
 
-A: The SDK throws `DropboxException` with code 429. Implement exponential backoff as shown in the troubleshooting section.
+A: The SDK throws `DropboxException` with code 429. Implement exponential backoff as shown in the troubleshooting
+section.
 
 **Q: Can I upload files from URLs directly to Dropbox?**
 
@@ -1413,7 +1429,8 @@ A: Yes, `saveUrl()` tells Dropbox to fetch the file from a URL on its side.
 
 **Q: How do I get a permanent link to a file?**
 
-A: `createSharedLinkWithSettings()` gives you a permanent link. For short-lived links (4 hours), use `getTemporaryLink()`.
+A: `createSharedLinkWithSettings()` gives you a permanent link. For short-lived links (4 hours), use
+`getTemporaryLink()`.
 
 **Q: Does it support Dropbox Paper?**
 
@@ -1421,13 +1438,15 @@ A: Yes, the Paper endpoint covers creating, editing, sharing, and deleting Paper
 
 **Q: How do I handle file conflicts?**
 
-A: Pass the `mode` parameter: `'add'` (fail if exists), `'overwrite'` (replace), or `'update'` (update a specific revision).
+A: Pass the `mode` parameter: `'add'` (fail if exists), `'overwrite'` (replace), or `'update'` (update a specific
+revision).
 
 ### Security Questions
 
 **Q: How should I store access tokens?**
 
-A: Don't store tokens in plain text. Use `encrypt()` in Laravel, environment variables, or a secrets manager. In production, use OAuth with refresh tokens.
+A: Don't store tokens in plain text. Use `encrypt()` in Laravel, environment variables, or a secrets manager. In
+production, use OAuth with refresh tokens.
 
 **Q: Is it safe to use in multi-tenant applications?**
 
@@ -1494,17 +1513,17 @@ Route::post('/dropbox/webhook', [DropboxWebhookController::class, 'handle'])
 
 ## Comparison with Official Dropbox SDK
 
-| Feature | This SDK | Official Dropbox SDK |
-|---------|----------|---------------------|
-| PHP Version | 8.1+ | 7.4+ |
-| Laravel Integration | Built-in (provider, facade) | Manual |
-| API v2 Coverage | All major endpoints | All endpoints |
-| Documentation | Examples + API reference | API reference |
-| Type Safety | Full type hints | Partial |
-| Error Handling | Dedicated exception class | Basic exceptions |
-| Chunked Upload | Built-in helpers | Manual implementation |
-| Batch Operations | Supported | Supported |
-| OAuth 2.0 Helpers | Included | Manual |
+| Feature             | This SDK                    | Official Dropbox SDK  |
+|---------------------|-----------------------------|-----------------------|
+| PHP Version         | 8.1+                        | 7.4+                  |
+| Laravel Integration | Built-in (provider, facade) | Manual                |
+| API v2 Coverage     | All major endpoints         | All endpoints         |
+| Documentation       | Examples + API reference    | API reference         |
+| Type Safety         | Full type hints             | Partial               |
+| Error Handling      | Dedicated exception class   | Basic exceptions      |
+| Chunked Upload      | Built-in helpers            | Manual implementation |
+| Batch Operations    | Supported                   | Supported             |
+| OAuth 2.0 Helpers   | Included                    | Manual                |
 
 ### Migration from Other Libraries
 
@@ -1524,7 +1543,8 @@ $dropbox->getMetadata('/path');
 $client->files->getMetadata('/path');
 ```
 
-Method names follow the Dropbox API naming, so the [official HTTP docs](https://www.dropbox.com/developers/documentation/http/documentation) serve as a reference.
+Method names follow the Dropbox API naming, so
+the [official HTTP docs](https://www.dropbox.com/developers/documentation/http/documentation) serve as a reference.
 
 ## Real-World Use Cases
 
