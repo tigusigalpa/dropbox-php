@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/packagist/l/tigusigalpa/dropbox-php.svg)](https://github.com/tigusigalpa/dropbox-php/blob/main/LICENSE)
 [![PHP Version](https://img.shields.io/packagist/php-v/tigusigalpa/dropbox-php.svg)](https://packagist.org/packages/tigusigalpa/dropbox-php)
 
-PHP SDK for [Dropbox API v2](https://www.dropbox.com/developers/documentation/http/documentation) with Laravel 8-12
+PHP SDK for [Dropbox API v2](https://www.dropbox.com/developers/documentation/http/documentation) with Laravel 8-13
 support.
 Provides a type-safe interface for working with Dropbox storage, file sharing, and collaboration from PHP 8.1+
 applications.
@@ -54,7 +54,7 @@ Laravel users get a service provider, facade, and config publishing out of the b
 ## Features
 
 - ✅ **Dropbox API v2** — all major endpoints covered
-- 🚀 **Laravel 8–12** — service provider, facade, config publishing
+- 🚀 **Laravel 8–13** — service provider, facade, config publishing
 - 🎯 **PHP 8.1+** — typed properties, enums, named arguments
 - 📦 **Standalone** — works without any framework
 - 🔐 **OAuth 2.0** — authorization URL, token exchange, refresh

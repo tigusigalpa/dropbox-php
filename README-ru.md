@@ -7,7 +7,7 @@
 [![PHP Version](https://img.shields.io/packagist/php-v/tigusigalpa/dropbox-php.svg)](https://packagist.org/packages/tigusigalpa/dropbox-php)
 
 PHP SDK для [Dropbox API v2](https://www.dropbox.com/developers/documentation/http/documentation) с поддержкой Laravel
-8-12.
+8-13.
 Типобезопасный интерфейс для работы с хранилищем Dropbox, шарингом файлов и совместной работой из PHP 8.1+ приложений.
 Можно использовать автономно или как Laravel-пакет с автоматической регистрацией service provider и facade.
 
@@ -53,7 +53,7 @@ PHP SDK для [Dropbox API v2](https://www.dropbox.com/developers/documentation
 ## Особенности
 
 - ✅ **Dropbox API v2** — покрыты все основные эндпоинты
-- 🚀 **Laravel 8–12** — service provider, facade, публикация конфига
+- 🚀 **Laravel 8–13** — service provider, facade, публикация конфига
 - 🎯 **PHP 8.1+** — типизированные свойства, enumы, именованные аргументы
 - 📦 **Автономно** — работает без фреймворка
 - 🔐 **OAuth 2.0** — URL авторизации, обмен токенов, обновление
